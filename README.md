@@ -97,7 +97,7 @@ Get info about Ingress Routes
 kubectl get ingresses
 ```
 
-03 BONUS Load Balancing
+### 03 BONUS Load Balancing
 
 Create kubernetes cluster with one master node and two workers.
 
