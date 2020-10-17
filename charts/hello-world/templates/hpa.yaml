@@ -1,6 +1,6 @@
 {{- if .Values.autoscaling.enabled }}
 {{- $fullName := include "hello-world.fullname" . -}}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "hello-world.fullname" . }}
