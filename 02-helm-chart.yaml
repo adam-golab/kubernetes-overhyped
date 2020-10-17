@@ -6,10 +6,10 @@ metadata:
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: frontend-api
+  name: hello-world
   namespace: hello-world
 spec:
-  releaseName: frontend-api
+  releaseName: hello-world
   chart:
     git: https://github.com/adam-golab/kubernetes-overhyped.git
     ref: master
