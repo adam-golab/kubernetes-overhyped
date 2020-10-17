@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-stack
+  namespace: monitoring
+spec:
+  releaseName: prometheus-stack
+  chart:
+    repository: https://prometheus-community.github.io/helm-charts
+    name: kube-prometheus-stack
+    version: 9.4.4
+  values:
+    kubeEtcd:
+      enabled: false
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    defaultRules:
+      rules:
+        kubeScheduler: false
+        etcd: false
+    grafana:
+      enabled: true
+      defaultDashboardsEnabled: true
+      adminUser: admin
+      adminPassword: <PASSWORD>
+      ingress:
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt
+        hosts:
+          - monitoring.devjs.ml
+        path: /
+        tls:
+        - secretName: prometheus-stack-grafana-nginx-cert
+          hosts:
+          - monitoring.devjs.ml
+      grafana.ini:
+        server:
+          root_url: ""
+        smtp:
+          enabled: true
+          host: ""
+      #   passwordKey: "password"

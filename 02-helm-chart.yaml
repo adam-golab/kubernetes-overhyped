@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hello-world
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: frontend-api
+  namespace: hello-world
+spec:
+  releaseName: frontend-api
+  chart:
+    git: https://github.com/adam-golab/kubernetes-overhyped.git
+    ref: master
+    path: charts/hello-world
+  values:
+    ingress:
+      enabled: true
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt
+      hosts:
+        - host: devjs.ml
+          paths:
+            - "/"
+      tls:
+      - secretName: hello-world-nginx-cert
+        hosts:
+          - devjs.ml
