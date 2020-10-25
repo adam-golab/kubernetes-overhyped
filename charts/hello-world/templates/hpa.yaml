@@ -34,7 +34,6 @@ spec:
         describedObject:
           apiVersion: extensions/v1beta1
           kind: Ingress
-          namespace: {{ .Release.Namespace }}
           name: {{ $fullName }}
         target:
           type: Value
