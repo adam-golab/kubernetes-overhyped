@@ -32,7 +32,7 @@ spec:
         metric:
           name: nginx_ingress_controller_requests
         describedObject:
-          apiVersion: extensions/v1beta1s
+          apiVersion: extensions/v1beta1
           kind: Ingress
           namespace: {{ .Release.Namespace }}
           name: {{ $fullName }}
