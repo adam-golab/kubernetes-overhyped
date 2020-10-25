@@ -32,8 +32,9 @@ spec:
         metric:
           name: nginx_ingress_controller_requests
         describedObject:
-          apiVersion: networking.k8s.io/v1beta1
+          apiVersion: extensions/v1beta1s
           kind: Ingress
+          namespace: {{ .Release.Namespace }}
           name: {{ $fullName }}
         target:
           type: Value
