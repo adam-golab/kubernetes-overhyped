@@ -48,3 +48,31 @@ spec:
           enabled: true
           host: ""
       #   passwordKey: "password"
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: prometheus-adapter
+  namespace: monitoring
+spec:
+  releaseName: prometheus-adapter
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: prometheus-adapter
+    version: 2.5.1
+  values:
+    prometheus:
+      url: http://prometheus-stack-kube-prom-prometheus
+    rules:
+      custom:
+        - seriesQuery: '{__name__="nginx_ingress_controller_requests",namespace!=""}'
+          resources:
+            template: <<.Resource>>
+            overrides:
+              exported_namespace:
+                resource: namespace
+          name:
+            matches: ""
+            as: ""
+          metricsQuery: sum(<<.Series>>{<<.LabelMatchers>>})
+          metricsQuery: round(sum(irate(<<.Series>>{<<.LabelMatchers>>}[2m])) by (ingress), 0.001)
