@@ -1,38 +1,31 @@
 # kubernetes-overhyped
 
-### Requirements
+### Usefull tools
 
 - [k3d](https://github.com/rancher/k3d) - Little helper to run Rancher Lab's k3s in Docker
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) - The Kubernetes command-line tool
+- [Helm v3](https://helm.sh/docs/intro/install/) - Helm charts
 
-### 01 NodePort
 
-Create kubernetes cluster with one master node and two workers.
+### 00 Setup
 
-```
-k3d create -x --disable-agent --publish 8080:30080@k3d-k3s-default-worker-0 --workers 2
-```
+Connect to kubernetes cluster (may be created locally by k3d).
 
-- `-x --disable-agent` - do not run agent on the master node
-- `--publish 8080:30080@k3d-k3s-default-worker-0` - expose port 30080 on host machine port 8080
-- `--workers 2` - run two workers
+You can check the k8s nodes running `kubectl get nodes`.
 
-Get information about working nodes
+Install infrastruccture applications
 
-```
-kubectl get nodes
+```sh
+./infrastructure/install.sh
+kubectl apply -f infrastructure
 ```
 
-Get details about selected node
+### 01 Simple deployment
+
+Simple Hello World app with support for TLS/SSL out of the box.
 
 ```
-kubectl describe node k3d-k3s-default-worker-0
-```
-
-Deploy first example of exposing applications via NodePort
-
-```
-kubectl apply -f nodePort.yaml
+kubectl apply -f 01-deployment.yaml
 ```
 
 Get information about deployed pods
@@ -44,39 +37,15 @@ kubectl get pods -o wide
 When it is ready get response from deployed application
 
 ```
-curl -i localhost:8080
+curl -i devjs.ml
 ```
 
-### 02 Ingress
+### 02 Helm Chart
 
-**RECOMMENDED WAY TO EXPOSE APPS**
-
-Create kubernetes cluster with one master node and two workers.
+Simple Hello World deployed from a Helm Chart, so that we can write less code to deploy the app. 
 
 ```
- k3d create -x --disable-agent --publish 8080:80@k3d-k3s-default-worker-0 --workers 2
-```
-
-- `-x --disable-agent` - do not run agent on the master node
-- `--publish 8080:80@k3d-k3s-default-worker-0` - expose port 80 on host machine port 8080
-- `--workers 2` - run two workers
-
-Get information about working nodes
-
-```
-kubectl get nodes
-```
-
-Get details about selected node
-
-```
-kubectl describe node k3d-k3s-default-worker-0
-```
-
-Deploy first example of exposing applications with usage of Ingress
-
-```
-kubectl apply -f ingress.yaml
+kubectl apply -f 02-helm-chart.yaml
 ```
 
 Get information about deployed pods
@@ -88,43 +57,15 @@ kubectl get pods -o wide
 When it is ready get response from deployed application
 
 ```
-curl -i localhost:8080
+curl -i devjs.ml
 ```
 
-Get info about Ingress Routes
+### 03 Horizontal Scaling
+
+Simple Hello World deployed from a Helm Chart with support for a custom metric and scaling rules. 
 
 ```
-kubectl get ingresses
-```
-
-### 03 BONUS Load Balancing
-
-Create kubernetes cluster with one master node and two workers.
-
-```
- k3d create -x --disable-agent --publish 8080:80@k3d-k3s-default-worker-0 --workers 2
-```
-
-- `-x --disable-agent` - do not run agent on the master node
-- `--publish 8080:80@k3d-k3s-default-worker-0` - expose port 80 on host machine port 8080
-- `--workers 2` - run two workers
-
-Get information about working nodes
-
-```
-kubectl get nodes
-```
-
-Get details about selected node
-
-```
-kubectl describe node k3d-k3s-default-worker-0
-```
-
-Deploy first example of exposing applications with usage of Ingress
-
-```
-kubectl apply -f ingress.yaml
+kubectl apply -f 03-autoscaling.yaml
 ```
 
 Get information about deployed pods
@@ -136,7 +77,16 @@ kubectl get pods -o wide
 When it is ready get response from deployed application
 
 ```
-curl -i localhost:8080
+curl -i devjs.ml
 ```
 
-Each time you send a request you should get a response from different pod. It shows how selectors in services are working.
+Generate some trafic to trigger scaling mechanism
+
+```
+hey -z=60s -q 50 -c 50 https://devjs.ml
+```
+
+Watch how kubernetes is creating a new pods with our application
+```
+watch kubectls get pods -n hello-world
+```
